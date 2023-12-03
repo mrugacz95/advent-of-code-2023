@@ -1,3 +1,4 @@
+import re
 from re import findall
 
 from utils import read_input
@@ -45,7 +46,7 @@ def get_number(string, position):
         else:
             break
     number = prefix + start_char + suffix
-    return number, len(suffix)
+    return number, len(suffix)  # return number and how long it is after encountered digit
 
 
 def part1(input):
@@ -58,7 +59,7 @@ def part1(input):
                 neighbours = adjacent(y, x, len(board), len(line), eight_neighbours)
                 for ny, nx in neighbours:
                     if board[ny][nx].isdigit():
-                        mask[ny][nx] = True
+                        mask[ny][nx] = True  # mark mask if any adjacent number
     sum = 0
     for y, line in enumerate(mask):
         x = 0
@@ -66,13 +67,35 @@ def part1(input):
             if line[x] is True and board[y][x].isdigit():
                 number, length_after = get_number(board[y], x)
                 sum += int(number)
-                x += length_after
+                x += length_after  # skip number to count it once
             x += 1
     return sum
 
 
 def part2(input):
-    return -1
+    board = input.split('\n')
+    mask = [[-1 for x in line] for line in board]  # mask allowing mapping y,x to number
+    numbers = []  # list of all available numbers
+    for y, line in enumerate(board):
+        for group in re.finditer(r'[0-9]+', line):
+            number_start = group.span()[0]
+            number_end = group.span()[1]
+            number_len = number_end - number_start
+            mask[y][number_start:number_end] = [len(numbers) for _ in range(number_len)]
+            numbers.append(int(group.group()))
+    sum = 0
+    for y, line in enumerate(board):
+        for x, c in enumerate(line):
+            if c == '*':
+                number_indices = set()  # avoid duplication with set
+                neighbours = adjacent(y, x, len(board), len(line), eight_neighbours)
+                for ny, nx in neighbours:
+                    if board[ny][nx].isdigit():
+                        number_indices.add(mask[ny][nx])
+                if len(number_indices) == 2:
+                    neighbour_numbers = [numbers[idx] for idx in number_indices]
+                    sum += neighbour_numbers[0] * neighbour_numbers[1]
+    return sum
 
 
 def main():
