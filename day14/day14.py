@@ -103,27 +103,33 @@ def print_board(board):
 
 # CYCLES = 4
 CYCLES = 1000000000
-INIT_CYCLES = 1000
+
+
+def find_cycle(seq):
+    for cycle_len in range(10, len(seq) - 10):
+        if seq[-cycle_len:] == seq[-cycle_len - cycle_len: - cycle_len]:
+            return cycle_len, len(seq) - cycle_len
+    return None, None
 
 
 def part2(input_data):
     board = parse(input_data)
     directions = [Directions.NORTH, Directions.WEST, Directions.SOUTH, Directions.EAST]
     after_cycle_load = []
-    for cycle in range(CYCLES):
+    cycle_len = None
+    for cycle_len in range(CYCLES):
         for direction in directions:
             after_fall = fall_rocks_in_direction(board, direction)
             board = after_fall
         after_cycle_load.append(calc_load(board))
-        if len(after_cycle_load) > INIT_CYCLES:
+        cycle_len, cycle_start = find_cycle(after_cycle_load)
+        if cycle_len is not None:
             break
-    for cycle_len in range(1, INIT_CYCLES):
-        if after_cycle_load[-cycle_len:] == after_cycle_load[-cycle_len - cycle_len: - cycle_len]:
-            cycle_start = len(after_cycle_load) - cycle_len
-            reminder = (CYCLES - cycle_start) % cycle_len
-            load = after_cycle_load[cycle_start + reminder - 1]
-            return load
-    raise RuntimeError("no cycle found")
+    print("cycle length", cycle_len)
+    cycle_start = len(after_cycle_load) - cycle_len
+    reminder = (CYCLES - cycle_start) % cycle_len
+    load = after_cycle_load[cycle_start + reminder - 1]
+    return load
 
 
 def main():
@@ -142,10 +148,19 @@ def main():
     assert fall_rocks_in_direction([['.', '.', 'O']], Directions.WEST) == [['O', '.', '.']]
     assert 64 == part2(puzzle.examples[0].input_data)
     print("part2 example OK")
+    import time
 
+    start_time = time.time()
     puzzle.answer_b = part2(puzzle.input_data)
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+    print("Elapsed time: ", elapsed_time)
     print("part2 OK")
 
 
 if __name__ == '__main__':
     main()
+
+# init with 1000 cycles - 5.44 s
+# naive cycle detection - 1.01 s
