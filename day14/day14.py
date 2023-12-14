@@ -102,20 +102,53 @@ def print_board(board):
 
 CYCLES = 1000000000
 
-cycle_cache = set()
+cycle_cache = {}
 
 
-def find_cycle(seq):
-    for cycle_len in range(3, len(seq) - 3):
-        cycle_hash = hash(tuple(seq[-cycle_len:]))
-        if cycle_hash in cycle_cache:
+def find_naive_cycle(seq):
+    if len(seq) < 1000:  # wait for at least 1000 values
+        return None
+    for cycle_len in range(6, len(seq) - 6):
+        if seq[-cycle_len:] == seq[-cycle_len - cycle_len: - cycle_len]:
             return cycle_len
-        else:
-            cycle_cache.add(cycle_hash)
     return None
 
 
-def part2(input_data):
+def find_subarray_cycle(seq):
+    for cycle_len in range(6, len(seq) - 6):
+        if seq[-cycle_len:] == seq[-cycle_len - cycle_len: - cycle_len]:
+            return cycle_len
+    return None
+
+
+def find_hash_cycle(seq):
+    for cycle_len in range(6, len(seq) - 6):
+        cycle_hash = hash(tuple(seq[-cycle_len:]))
+        if cycle_hash in cycle_cache:
+            prev_len = cycle_cache[cycle_hash]
+            cycle_cache.clear()
+            return len(seq) - prev_len
+        else:
+            cycle_cache[cycle_hash] = len(seq)
+    return None
+
+
+def tortoise_and_hare(seq):
+    if len(seq) <= 6:
+        return None
+    tortoise = len(seq) - 1
+    hare = len(seq) - 2
+    cycle_len = 1
+    while seq[tortoise] != seq[hare] or cycle_len <= 6:
+        tortoise -= 1
+        hare -= 2
+        cycle_len += 1
+        if hare < 0:
+            return None
+    return cycle_len
+
+
+def part2(input_data, cycle_det_func):
     board = parse(input_data)
     directions = [Directions.NORTH, Directions.WEST, Directions.SOUTH, Directions.EAST]
     after_cycle_load = []
@@ -125,7 +158,7 @@ def part2(input_data):
             after_fall = fall_rocks_in_direction(board, direction)
             board = after_fall
         after_cycle_load.append(calc_load(board))
-        cycle_len = find_cycle(after_cycle_load)
+        cycle_len = cycle_det_func(after_cycle_load)
         if cycle_len is not None:
             break
     print("cycle length", cycle_len)
@@ -149,12 +182,13 @@ def main():
 
     assert rotate_board_right([['O'], ['.'], ['.']]) == [['.', '.', 'O']]
     assert fall_rocks_in_direction([['.', '.', 'O']], Directions.WEST) == [['O', '.', '.']]
-    assert 64 == part2(puzzle.examples[0].input_data)
+    cycle_detection_algorith = tortoise_and_hare
+    assert 64 == part2(puzzle.examples[0].input_data, cycle_detection_algorith)
     print("part2 example OK")
     import time
 
     start_time = time.time()
-    puzzle.answer_b = part2(puzzle.input_data)
+    puzzle.answer_b = part2(puzzle.input_data, cycle_detection_algorith)
     end_time = time.time()
 
     elapsed_time = end_time - start_time
@@ -165,6 +199,7 @@ def main():
 if __name__ == '__main__':
     main()
 
-# init with 1000 cycles - 5.44 s
-# naive cycle detection - 1.01 s
-# hash cycle detection  - 0.84 s
+# init with 1000 cycles    - 5.44 s
+# subarray cycle detection - 0.96 s
+# tortoise and hare        - 0.96 s
+# hash cycle detection     - 0.84 s
