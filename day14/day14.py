@@ -85,7 +85,6 @@ def fall_rocks_in_direction(board, direction):
     for _ in range(rotations):
         rotated = rotate_board_right(rotated)
     rotated = fall_rocks(rotated)
-    correct_rotation = rotated
     if rotations != 0:
         for _ in range(4 - rotations):
             rotated = rotate_board_right(rotated)
@@ -101,15 +100,19 @@ def print_board(board):
     print()
 
 
-# CYCLES = 4
 CYCLES = 1000000000
+
+cycle_cache = set()
 
 
 def find_cycle(seq):
-    for cycle_len in range(10, len(seq) - 10):
-        if seq[-cycle_len:] == seq[-cycle_len - cycle_len: - cycle_len]:
-            return cycle_len, len(seq) - cycle_len
-    return None, None
+    for cycle_len in range(3, len(seq) - 3):
+        cycle_hash = hash(tuple(seq[-cycle_len:]))
+        if cycle_hash in cycle_cache:
+            return cycle_len
+        else:
+            cycle_cache.add(cycle_hash)
+    return None
 
 
 def part2(input_data):
@@ -122,7 +125,7 @@ def part2(input_data):
             after_fall = fall_rocks_in_direction(board, direction)
             board = after_fall
         after_cycle_load.append(calc_load(board))
-        cycle_len, cycle_start = find_cycle(after_cycle_load)
+        cycle_len = find_cycle(after_cycle_load)
         if cycle_len is not None:
             break
     print("cycle length", cycle_len)
@@ -164,3 +167,4 @@ if __name__ == '__main__':
 
 # init with 1000 cycles - 5.44 s
 # naive cycle detection - 1.01 s
+# hash cycle detection  - 0.84 s
