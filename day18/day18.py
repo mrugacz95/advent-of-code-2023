@@ -13,13 +13,14 @@ def parse(input_data):
     return result
 
 
-def shoelance(vectors):
+def shoelace(vectors):
     area = 0
     vectors.append(vectors[0])
-    for x1, y2 in zip(map(lambda v: v[0], vectors[:-1]), map(lambda v: v[1], vectors[1:])):
+    for i in range(len(vectors) - 1):
+        x1, y1 = vectors[i]
+        x2, y2 = vectors[i + 1]
         area += x1 * y2
-    for y2, x1 in zip(map(lambda v: v[0], vectors[1:]), map(lambda v: v[1], vectors[:-1])):
-        area -= x1 * y2
+        area -= x2 * y1
     return area / 2
 
 
@@ -40,13 +41,13 @@ def segments_to_vectors(segments):
     def get_next_dir(i):
         return segments[(i + 1) % len(segments)][0]
 
-    def get_prev(i):
+    def get_prev_dir(i):
         return segments[i - 1][0]
 
     for i in range(len(segments)):
         d, l, c = segments[i]
         next_dir = get_next_dir(i)
-        prev_dir = get_prev(i)
+        prev_dir = get_prev_dir(i)
         is_prev_cloc = 0 if is_clockwise(prev_dir, d) else -1
         is_next_cloc = 1 if is_clockwise(d, next_dir) else 0
         dy, dx = {
@@ -64,17 +65,17 @@ def segments_to_vectors(segments):
 def part1(input_data):
     segments = parse(input_data)
     vectors = segments_to_vectors(segments)
-    return shoelance(vectors)
+    return shoelace(vectors)
 
 
-def decode(hex):
+def decode(color):
     d = {
         '0': 'R',
         '1': 'D',
         '2': 'L',
         '3': 'U'
-    }.get(hex[-1])
-    length = int(hex[1:-1], 16)
+    }.get(color[-1])
+    length = int(color[1:-1], 16)
     return d, length, None
 
 
@@ -84,11 +85,11 @@ def part2(input_data):
     for seg in segments:
         decoded_segments.append(decode(seg[2]))
     vectors = segments_to_vectors(decoded_segments)
-    return shoelance(vectors)
+    return shoelace(vectors)
 
 
 def main():
-    assert shoelance([(1, 6), (3, 1), (7, 2), (4, 4), (8, 5)]) == 16.5
+    assert shoelace([(1, 6), (3, 1), (7, 2), (4, 4), (8, 5)]) == 16.5
     assert segments_to_vectors([('U', 3, '-'), ('R', 5, '-'),
                                 ('D', 3, '-'), ('L', 5, '-')]) == [(4, 0), (4, 6), (0, 6), (0, 0)]
     assert 20 == part1("U 3 -\n"
