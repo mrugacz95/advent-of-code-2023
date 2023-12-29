@@ -1,13 +1,9 @@
-from collections import deque, defaultdict
 from functools import cache
-from re import findall
-
-from tqdm import tqdm
-
-from day17.day17 import in_bounds
-from utils import read_input
+from typing import Tuple, List
 
 from aocd.models import Puzzle
+
+from day17.day17 import in_bounds
 
 puzzle = Puzzle(year=2023, day=21)
 
@@ -32,7 +28,8 @@ neighbours = [
 ]
 
 
-def simulate_from_point(sy, sx, board, max_steps):
+@cache
+def simulate_from_point(sy, sx, board, max_steps, print_result=False):
     queue = {(sy, sx)}
     next_queue = set()
     for i in range(max_steps):
@@ -43,13 +40,15 @@ def simulate_from_point(sy, sx, board, max_steps):
                     next_queue.add((ny, nx))
         queue = next_queue
         next_queue = set()
+    if print_result:
+        print_board(list(queue), board)
     return len(queue)
 
 
-def part1(input_data, max_steps):
+def part1(input_data, max_steps, debug=False):
     board = parse(input_data)
     sy, sx = start_pos(board)
-    return simulate_from_point(sy, sx, board, max_steps)
+    return simulate_from_point(sy, sx, board, max_steps, print_result=debug)
 
 
 def get_infinite_board(y, x, board):
@@ -58,24 +57,22 @@ def get_infinite_board(y, x, board):
     return board[y % len(board)][x % len(board[0])]
 
 
-def print_board(queue, board):
+def print_board(queue: List[Tuple[int, int]], board):
     new_board = []
-    for i in range(3):
-        for row in board:
-            new_row = []
-            for i in range(3):
-                for cell in row:
-                    new_row.append(cell)
-            new_board.append(new_row)
+    for row in board:
+        new_row = []
+        for cell in row:
+            new_row.append(cell)
+        new_board.append(new_row)
 
-    for (y, x) in queue:
-        new_board[y + len(board)][x + len(board[0])] = 'O'
+    for y, x in queue:
+        new_board[y][x] = 'O'
 
     for row in new_board:
         print(''.join(row))
 
 
-def part2(input_data, max_steps):
+def part2_naive(input_data, max_steps):
     board = parse(input_data)
     sy, sx = start_pos(board)
     queue = {(sy, sx)}
@@ -89,37 +86,87 @@ def part2(input_data, max_steps):
                     next_queue.add((ny, nx))
         queue = next_queue
         next_queue = set()
-    # print_board(queue, board)
+    print(len(queue))
     return len(queue)
 
 
+def part2(input_data, steps):
+    board = parse(input_data)
+    size = len(board)
+    n = (steps - size // 2) // size
+    top_mid = simulate_from_point(size - 1, size // 2, board, size - 1)
+    left_mid = simulate_from_point(size // 2, size - 1, board, size - 1)
+    right_mid = simulate_from_point(size // 2, 0, board, size - 1)
+    bottom_mid = simulate_from_point(0, size // 2, board, size - 1)
+
+    top_left_small = simulate_from_point(size - 1, size - 1, board, size // 2 - 1)
+    top_left_big = simulate_from_point(size - 1, size - 1, board, size // 2 + size - 1)
+
+    top_right_small = simulate_from_point(size - 1, 0, board, size // 2 - 1)
+    top_right_big = simulate_from_point(size - 1, 0, board, size // 2 + size - 1)
+
+    bottom_left_small = simulate_from_point(0, size - 1, board, size // 2 - 1)
+    bottom_left_big = simulate_from_point(0, size - 1, board, size // 2 + size - 1)
+
+    bottom_right_small = simulate_from_point(0, 0, board, size // 2 - 1)
+    bottom_right_big = simulate_from_point(0, 0, board, size // 2 + size - 1)
+
+    start = simulate_from_point(size // 2, size // 2, board, size // 2 + size)
+    nonstart = simulate_from_point(size // 2, size // 2, board, size // 2 + size + 1)
+
+    result = top_mid + left_mid + bottom_mid + right_mid
+
+    even = n ** 2
+    odd = (n - 1) ** 2
+    result += even * start
+    result += odd * nonstart
+
+    result += n * top_left_small
+    result += (n - 1) * top_left_big
+
+    result += n * top_right_small
+    result += (n - 1) * top_right_big
+
+    result += n * bottom_left_small
+    result += (n - 1) * bottom_left_big
+
+    result += n * bottom_right_small
+    result += (n - 1) * bottom_right_big
+
+    return result
+
+
 def main():
-    assert 16 == part1(puzzle.examples[0].input_data, 6)
+    assert 16 == part1(puzzle.examples[0].input_data, 6, debug=True)
     print("part1 example OK")
 
     puzzle.answer_a = part1(puzzle.input_data, 64)
     print("part1 OK")
 
-    assert 16 == part2(puzzle.examples[0].input_data, 6)
+    assert 16 == part2_naive(puzzle.examples[0].input_data, 6)
     print("part2 example 6 OK")
-    assert 50 == part2(puzzle.examples[0].input_data, 10)
+    assert 50 == part2_naive(puzzle.examples[0].input_data, 10)
     print("part2 example 10 OK")
-    assert 1594 == part2(puzzle.examples[0].input_data, 50)
+    assert 1594 == part2_naive(puzzle.examples[0].input_data, 50)
     print("part2 example 50 OK")
-    assert 3687 == part2(puzzle.examples[0].input_data, 75)
+    assert 3687 == part2_naive(puzzle.examples[0].input_data, 75)
     print("part2 example 75 OK")
-    assert 6536 == part2(puzzle.examples[0].input_data, 100)
+    assert 6536 == part2_naive(puzzle.examples[0].input_data, 100)
     print("part2 example 100 OK")
-    assert 167004 == part2(puzzle.examples[0].input_data, 500)
+    assert 167004 == part2_naive(puzzle.examples[0].input_data, 500)
     print("part2 example 500 OK")
 
-    print("Part2 solution for next examples is too slow")
-    return
+    print("Naive part2 solution for next examples is too slow")
 
-    assert 668697 == part2(puzzle.examples[0].input_data, 1000)
-    print("part2 example 1000 OK")
-    assert 16733044 == part2(puzzle.examples[0].input_data, 5000)
-    print("part2 example OK")
+    n = 1
+    steps = n * 131 + 65
+    assert part2_naive(puzzle.input_data, steps) == part2(puzzle.input_data, steps)
+    print("Example with n=1 OK")
+
+    n = 2
+    steps = n * 131 + 65
+    assert part2_naive(puzzle.input_data, steps) == part2(puzzle.input_data, steps)
+    print("Example with n=2 OK")
 
     puzzle.answer_b = part2(puzzle.input_data, 26501365)
     print("part2 OK")
