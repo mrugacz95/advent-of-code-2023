@@ -1,7 +1,3 @@
-from re import findall
-
-from utils import read_input
-
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=13)

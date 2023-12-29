@@ -1,28 +1,25 @@
 import re
-from re import findall
 from typing import Set, Tuple, List
-
-from utils import read_input
 
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=4)
 
 
-def parse(input) -> List[Tuple[Set[int], Set[int]]]:
-    lines = input.split("\n")
+def parse(data_input) -> List[Tuple[Set[int], Set[int]]]:
+    lines = data_input.split("\n")
     parsed_cards = []
     for line in lines:
         _, cards = re.split(": +", line)
-        winning, appeared = re.split(" \| +", cards)
+        winning, appeared = re.split(r" \| +", cards)
         winning_number = set(map(lambda x: int(x), re.split(" +", winning)))
         appeared_number = set(map(lambda x: int(x), re.split(" +", appeared)))
         parsed_cards.append((winning_number, appeared_number))
     return parsed_cards
 
 
-def part1(input):
-    cards = parse(input)
+def part1(data_input):
+    cards = parse(data_input)
     points = 0
     for winning, appeared in cards:
         winning_numbers = len(winning.intersection(appeared))
@@ -31,10 +28,9 @@ def part1(input):
     return points
 
 
-def part2(input):
-    cards = parse(input)
+def part2(data_input):
+    cards = parse(data_input)
     owned_cards = [1 for _ in cards]
-    points = 0
     for idx, cards_amount in enumerate(owned_cards):
         winning, appeared = cards[idx]
         winning_numbers = len(winning.intersection(appeared))

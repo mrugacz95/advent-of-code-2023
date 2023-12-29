@@ -1,4 +1,3 @@
-from collections import defaultdict
 from enum import Enum
 from heapq import heappush, heappop
 
@@ -57,13 +56,13 @@ def print_board_with_path(board, prev):
     y = len(board) - 1
     x = len(board[0]) - 1
     while not (y == 0 and x == 0):
-        prev_y, prev_x, dir = prev[y][x]
+        prev_y, prev_x, direction = prev[y][x]
         dir_symb = {
             Dir.UP: '^',
             Dir.DOWN: 'v',
             Dir.RIGHT: '>',
             Dir.LEFT: '<',
-        }.get(dir)
+        }.get(direction)
         with_path[y][x] = dir_symb
         y, x, = prev_y, prev_x
     print('path')
@@ -77,19 +76,19 @@ def find_path(board):
     visited = set()
     lowest_cost = float('inf')
     while len(queue) != 0:
-        cost, y, x, straight, dir, prev_y, prev_x = heappop(queue)
-        if (y, x, straight, dir) in visited:
+        cost, y, x, straight, direction, prev_y, prev_x = heappop(queue)
+        if (y, x, straight, direction) in visited:
             continue
-        visited.add((y, x, straight, dir))
+        visited.add((y, x, straight, direction))
         # left
-        new_dir = turn_left(dir)
+        new_dir = turn_left(direction)
         dy, dx = get_delta(new_dir)
         new_y, new_x = y + dy, x + dx
         if in_bounds(board, new_y, new_x):
             new_cost = cost + board[new_y][new_x]
             heappush(queue, (new_cost, new_y, new_x, 3, new_dir, y, x))
         # right
-        new_dir = turn_right(dir)
+        new_dir = turn_right(direction)
         dy, dx = get_delta(new_dir)
         new_y, new_x = y + dy, x + dx
         if in_bounds(board, new_y, new_x):
@@ -97,11 +96,11 @@ def find_path(board):
             heappush(queue, (new_cost, new_y, new_x, 3, new_dir, y, x))
         # straight
         if straight > 1:
-            dy, dx = get_delta(dir)
+            dy, dx = get_delta(direction)
             new_y, new_x = y + dy, x + dx
             if in_bounds(board, new_y, new_x):
                 new_cost = cost + board[new_y][new_x]
-                heappush(queue, (new_cost, new_y, new_x, straight - 1, dir, y, x))
+                heappush(queue, (new_cost, new_y, new_x, straight - 1, direction, y, x))
         if y == len(board) - 1 and x == len(board[0]) - 1:
             lowest_cost = cost
             break
@@ -123,13 +122,13 @@ def find_ultra_path(board):
     min_moves = 3  # one less
     max_moves = 9  # one less
     while len(queue) != 0:
-        cost, y, x, straight, dir, prev_y, prev_x = heappop(queue)
-        if (y, x, straight, dir) in visited:
+        cost, y, x, straight, direction, prev_y, prev_x = heappop(queue)
+        if (y, x, straight, direction) in visited:
             continue
-        visited.add((y, x, straight, dir))
+        visited.add((y, x, straight, direction))
         # left
         if straight >= min_moves:
-            new_dir = turn_left(dir)
+            new_dir = turn_left(direction)
             dy, dx = get_delta(new_dir)
             new_y, new_x = y + dy, x + dx
             if in_bounds(board, new_y, new_x):
@@ -137,7 +136,7 @@ def find_ultra_path(board):
                 heappush(queue, (new_cost, new_y, new_x, 0, new_dir, y, x))
         # right
         if straight >= min_moves:
-            new_dir = turn_right(dir)
+            new_dir = turn_right(direction)
             dy, dx = get_delta(new_dir)
             new_y, new_x = y + dy, x + dx
             if in_bounds(board, new_y, new_x):
@@ -145,11 +144,11 @@ def find_ultra_path(board):
                 heappush(queue, (new_cost, new_y, new_x, 0, new_dir, y, x))
         # straight
         if straight < max_moves:
-            dy, dx = get_delta(dir)
+            dy, dx = get_delta(direction)
             new_y, new_x = y + dy, x + dx
             if in_bounds(board, new_y, new_x):
                 new_cost = cost + board[new_y][new_x]
-                heappush(queue, (new_cost, new_y, new_x, straight + 1, dir, y, x))
+                heappush(queue, (new_cost, new_y, new_x, straight + 1, direction, y, x))
         if y == len(board) - 1 and x == len(board[0]) - 1 and straight >= min_moves:
             lowest_cost = cost
             break

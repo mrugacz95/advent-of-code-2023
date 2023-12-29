@@ -1,7 +1,5 @@
 import re
-from bisect import bisect_right
-from functools import cache
-from typing import Tuple, List
+from typing import List
 
 from aocd.models import Puzzle
 from tqdm import tqdm
@@ -9,14 +7,14 @@ from tqdm import tqdm
 puzzle = Puzzle(year=2023, day=5)
 
 
-def parse(input):
+def parse(data_input):
     def parse_mappings(loc_mappings):
         parsed = []
         for line in loc_mappings.split("\n")[1:]:
             parsed.append(list(map(int, line.split(" "))))
         return parsed
 
-    lines = input.split("\n\n")
+    lines = data_input.split("\n\n")
     seeds = list(map(int, re.findall("[0-9]+", lines[0][6:])))
     seed2soil = parse_mappings(lines[1])
     soil2fertilizer = parse_mappings(lines[2])
@@ -30,10 +28,10 @@ def parse(input):
 
 
 def find_mapping(value, mapping):
-    for idx, range in enumerate(mapping):
-        if range[1] <= value < range[1] + range[2]:
-            diff = value - range[1]
-            return range[0] + diff
+    for idx, value_range in enumerate(mapping):
+        if value_range[1] <= value < value_range[1] + value_range[2]:
+            diff = value - value_range[1]
+            return value_range[0] + diff
     return value
 
 
@@ -61,8 +59,8 @@ def reverse_mappings(mappings: List[List[List[int]]]):
     new_mapping = []
     for mapping in mappings:
         new_range = []
-        for range in mapping:
-            new_range.append((range[1], range[0], range[2]))
+        for value_range in mapping:
+            new_range.append((value_range[1], value_range[0], value_range[2]))
         new_mapping.append(new_range)
     return new_mapping
 

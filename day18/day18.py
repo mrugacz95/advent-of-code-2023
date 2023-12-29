@@ -6,10 +6,10 @@ puzzle = Puzzle(year=2023, day=18)
 def parse(input_data):
     result = []
     for line in input_data.split("\n"):
-        dir, length, color = line.split(" ")
+        direction, length, color = line.split(" ")
         length = int(length)
         color = color[1:-1]
-        result.append((dir, length, color))
+        result.append((direction, length, color))
     return result
 
 
@@ -24,25 +24,25 @@ def shoelace(vectors):
     return area / 2
 
 
-def is_clockwise(dir, next_dir):
+def is_clockwise(direction, next_dir):
     clockwise = [
         ("U", "R"),
         ("R", "D"),
         ("D", "L"),
         ("L", "U"),
     ]
-    return (dir, next_dir) in clockwise
+    return (direction, next_dir) in clockwise
 
 
 def segments_to_vectors(segments):
     points = []
     vy, vx = 0, 0
 
-    def get_next_dir(i):
-        return segments[(i + 1) % len(segments)][0]
+    def get_next_dir(idx):
+        return segments[(idx + 1) % len(segments)][0]
 
-    def get_prev_dir(i):
-        return segments[i - 1][0]
+    def get_prev_dir(idx):
+        return segments[idx - 1][0]
 
     for i in range(len(segments)):
         d, l, c = segments[i]

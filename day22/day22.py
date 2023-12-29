@@ -8,13 +8,13 @@ puzzle = Puzzle(year=2023, day=22)
 
 
 class Cube:
-    def __init__(self, id: int, start: tuple, end: tuple):
+    def __init__(self, cube_id: int, start: tuple, end: tuple):
         self.sx, self.sy, self.sz = start
         self.ex, self.ey, self.ez = end
         assert self.sx <= self.ex
         assert self.sy <= self.ey
         assert self.sz <= self.ez
-        self.id = id
+        self.id = cube_id
 
     def get_ranges(self):
         return [(self.sz, self.ez), (self.sy, self.ey), (self.sx, self.ex)]  # start from z
@@ -99,8 +99,8 @@ def print_cubes(cubes):
     max_y = max(map(lambda c: c.sy, cubes)) + 1
     max_x = max(map(lambda c: c.sx, cubes)) + 1
     empty = '.'
-    result_x = [[empty for _ in range(max_x)] for z in range(max_z)]
-    result_y = [[empty for _ in range(max_y)] for z in range(max_z)]
+    result_x = [[empty for _ in range(max_x)] for _ in range(max_z)]
+    result_y = [[empty for _ in range(max_y)] for _ in range(max_z)]
 
     for cube in cubes:
         for z in range(cube.sz, cube.ez + 1):

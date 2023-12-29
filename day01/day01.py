@@ -1,21 +1,21 @@
 from re import findall
 
-from utils import read_input
-
 from aocd.models import Puzzle
+
 puzzle = Puzzle(year=2023, day=1)
 
-def part1(input):
-    sum = 0
-    for line in input.split('\n'):
+
+def part1(data_input):
+    result = 0
+    for line in data_input.split('\n'):
         digits = list(filter(lambda x: x.isnumeric(), str(line)))
         number = int(digits[0] + digits[-1])
-        sum += number
-    return sum
+        result += number
+    return result
 
 
-def part2(input):
-    def text_to_number(number):
+def part2(data_input):
+    def text_to_number(text):
         return {
             'one': '1',
             'two': '2',
@@ -26,16 +26,16 @@ def part2(input):
             'seven': '7',
             'eight': '8',
             'nine': '9'
-        }.get(number, number)
+        }.get(text, text)
 
-    sum = 0
-    for line in input.split('\n'):
+    result = 0
+    for line in data_input.split('\n'):
         digits = findall(r'(?=([1-9]{1}|one|two|three|four|five|six|seven|eight|nine))', str(line))
         first = text_to_number(digits[0])
         last = text_to_number(digits[-1])
         number = int(first + last)
-        sum += number
-    return sum
+        result += number
+    return result
 
 
 def main():
@@ -56,6 +56,7 @@ def main():
 
     puzzle.answer_b = part2(puzzle.input_data)
     print("part2 OK")
+
 
 if __name__ == '__main__':
     main()

@@ -1,9 +1,6 @@
 import re
 from functools import reduce
 from math import sqrt, floor, ceil
-from re import findall
-
-from utils import read_input
 
 from aocd.models import Puzzle
 
@@ -68,6 +65,7 @@ def main():
     print("part2 OK")
     puzzle.answer_b = part2_optimised(puzzle.input_data)
     print("part2 optimised OK")
+
 
 if __name__ == '__main__':
     main()

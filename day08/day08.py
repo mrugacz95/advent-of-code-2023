@@ -1,8 +1,4 @@
-import re
 from functools import reduce
-from re import findall
-
-from utils import read_input
 
 from aocd.models import Puzzle
 

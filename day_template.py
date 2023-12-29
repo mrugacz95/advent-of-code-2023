@@ -1,7 +1,3 @@
-from re import findall
-
-from utils import read_input
-
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=-1)
@@ -13,10 +9,12 @@ def parse(input_data):
 
 def part1(input_data):
     data = parse(input_data)
+    return -1
 
 
 def part2(input_data):
     data = parse(input_data)
+    return -1
 
 
 def main():

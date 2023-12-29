@@ -7,13 +7,10 @@ from aocd.models import Puzzle
 puzzle = Puzzle(year=2023, day=2)
 
 
-def parse(input):
+def parse(data_input):
     games = []
-    for line in input.split("\n"):
-        # groups = re.search(
-        #     r'Game (?P<game>([1-9]+)): (?P<cubes>((?P<subset>( ?(?P<dices>([0-9]+)) (?P<color>(red|green|blue)))(,)?)+(;)?)+)', line)
+    for line in data_input.split("\n"):
         game_input, cubes_input = line.split(":")
-        # game = int(re.search(r'Game (?P<game>([1-9]+)):', line).group("game"))
         subsets_intput = cubes_input.split(";")
         subsets = []
         for subset in subsets_intput:
@@ -29,8 +26,8 @@ def parse(input):
     return games
 
 
-def part1(input):
-    games = parse(input)
+def part1(data_input):
+    games = parse(data_input)
     possible_cubes = {
         'red': 12,
         'green': 13,
@@ -49,16 +46,17 @@ def part1(input):
     return possible_games
 
 
-def part2(input):
-    games = parse(input)
-    sum = 0
+def part2(data_input):
+    games = parse(data_input)
+    result = 0
     for game in games:
         min_dices = defaultdict(int)
         for subset in game:
             for cubes, color in subset:
                 min_dices[color] = max(min_dices[color], cubes)
-        sum += reduce(lambda x, y: x * y, min_dices.values())
-    return sum
+        result += reduce(lambda x, y: x * y, min_dices.values())
+    return result
+
 
 def main():
     assert 8 == part1(puzzle.examples[0].input_data)

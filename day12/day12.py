@@ -20,8 +20,8 @@ def parse(input_data):
 
 def correct_arrangement(springs, groups):
     assert '?' not in springs
-    spings_groups = re.split(r"\.+", springs.strip('.'))
-    return groups == list(map(lambda x: len(x), spings_groups))
+    springs_groups = re.split(r"\.+", springs.strip('.'))
+    return groups == list(map(lambda x: len(x), springs_groups))
 
 
 def fill_springs(spring, pattern):
@@ -98,15 +98,15 @@ def count_possibilities(spring, groups):
     group_len = groups[0]
     # find every suffix and check if group can start from it
     for start_pos in range(len(spring)):
-        sufix = spring[start_pos:]
-        if len(sufix) < group_len:  # optimisation
+        suffix = spring[start_pos:]
+        if len(suffix) < group_len:  # optimisation
             break
-        if can_group_start(sufix, group_len):
+        if can_group_start(suffix, group_len):
             if DEBUG:
                 print('next call from', spring, group_len, "pos", start_pos, "sufix:",
-                      sufix[group_len + 1:], "new groups", groups[1:])
+                      suffix[group_len + 1:], "new groups", groups[1:])
             # check if suffix will match remaining groups
-            possibilities += count_possibilities(sufix[group_len + 1:], groups[1:])
+            possibilities += count_possibilities(suffix[group_len + 1:], groups[1:])
         if spring[start_pos] == '#':  # must use all hash symbols
             if DEBUG: print("must use # at pos ", start_pos)
             break

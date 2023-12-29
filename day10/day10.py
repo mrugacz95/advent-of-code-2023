@@ -1,8 +1,3 @@
-from collections import deque
-from re import findall
-
-from utils import read_input
-
 from aocd.models import Puzzle
 
 puzzle = Puzzle(year=2023, day=10)
@@ -87,7 +82,7 @@ def part2(input_data):
             for x in range(2 * px, 2 * cx + 1):
                 mask[py * 2][x] = True
     if mask[0][0]:
-        raise RuntimeError("Left top corner is occuppies by pipe")
+        raise RuntimeError("Left top corner is occupies by pipe")
     # bff from corner and mark
     queue = [(0, 0)]
     while len(queue) > 0:
@@ -95,7 +90,6 @@ def part2(input_data):
         if mask[y][x]:
             continue
         mask[y][x] = True
-
 
         for side in SIDES:
             ny, nx = y + side[0], x + side[1]

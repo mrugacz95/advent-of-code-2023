@@ -127,20 +127,20 @@ def convert_to_graph(workflows):
     graph = {}  # (workflow, # of rule in workflow) : (category, left range, left node, right range, right node)
     visited = {('A', 0), ('R', 0)}
     while len(queue) > 0:
-        name, id = queue.pop(0)
-        if (name, id) in visited:
+        name, node_id = queue.pop(0)
+        if (name, node_id) in visited:
             continue
-        visited.add((name, id))
-        attr, op, value, next_name = workflows[name][id]
+        visited.add((name, node_id))
+        attr, op, value, next_name = workflows[name][node_id]
         if attr is None:
-            graph[(name, id)] = (None, Range.empty(), (next_name, 0), Range.empty(), None)
+            graph[(name, node_id)] = (None, Range.empty(), (next_name, 0), Range.empty(), None)
         else:
             rule = Range.from_rule(op, value)
-            graph[(name, id)] = (attr, rule, (next_name, 0),
-                                 rule.invert(), (name, id + 1))
+            graph[(name, node_id)] = (attr, rule, (next_name, 0),
+                                      rule.invert(), (name, node_id + 1))
 
         if attr is not None:
-            queue.append((name, id + 1))
+            queue.append((name, node_id + 1))
         queue.append((next_name, 0))
     return graph
 
@@ -175,7 +175,7 @@ def part2(input_data):
             new_ranges[attr] = xmas_range[attr] + right_range
             if all([not r.is_empty() for r in new_ranges.values()]):
                 dfs(right_node, new_ranges)
-        else: # next node without rule
+        else:  # next node without rule
             dfs(left_node, xmas_range)
         visited.remove(node)
 

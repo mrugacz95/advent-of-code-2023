@@ -2,9 +2,6 @@ import abc
 from collections import defaultdict, deque
 from enum import Enum
 from math import lcm
-from re import findall
-
-from utils import read_input
 
 from aocd.models import Puzzle
 

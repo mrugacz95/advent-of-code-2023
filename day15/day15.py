@@ -1,9 +1,6 @@
 import re
-from collections import deque, OrderedDict
+from collections import OrderedDict
 from functools import cache
-from re import findall
-
-from utils import read_input
 
 from aocd.models import Puzzle
 
@@ -55,7 +52,7 @@ def calc_power(boxes):
     return power
 
 
-def part2(input_data):
+def part2(input_data, debug=False):
     data = parse(input_data)
     boxes = [OrderedDict() for _ in range(256)]
     for step in data:
@@ -68,7 +65,7 @@ def part2(input_data):
             boxes[box_number][label] = focal_length
         else:
             raise RuntimeError(f"Unknown operation {op}")
-        print_boxes(boxes)
+        if debug: print_boxes(boxes)
 
     return calc_power(boxes)
 
@@ -83,7 +80,7 @@ def main():
 
     assert ('rm', '=', 6) == decode_step("rm=6")
     assert ('op', '-', None) == decode_step("op-")
-    assert 145 == part2(puzzle.examples[0].input_data)
+    assert 145 == part2(puzzle.examples[0].input_data, debug=True)
     print("part2 example OK")
 
     puzzle.answer_b = part2(puzzle.input_data)

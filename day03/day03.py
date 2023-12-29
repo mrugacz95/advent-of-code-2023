@@ -1,7 +1,4 @@
 import re
-from re import findall
-
-from utils import read_input
 
 from aocd.models import Puzzle
 
@@ -49,9 +46,9 @@ def get_number(string, position):
     return number, len(suffix)  # return number and how long it is after encountered digit
 
 
-def part1(input):
-    board = input.split('\n')
-    mask = [[False for x in line] for line in board]
+def part1(data_input):
+    board = data_input.split('\n')
+    mask = [[False for _ in line] for line in board]
     # find adjacent numbers
     for y, line in enumerate(board):
         for x, c in enumerate(line):
@@ -60,21 +57,21 @@ def part1(input):
                 for ny, nx in neighbours:
                     if board[ny][nx].isdigit():
                         mask[ny][nx] = True  # mark mask if any adjacent number
-    sum = 0
+    result = 0
     for y, line in enumerate(mask):
         x = 0
         while x < len(line):
             if line[x] is True and board[y][x].isdigit():
                 number, length_after = get_number(board[y], x)
-                sum += int(number)
+                result += int(number)
                 x += length_after  # skip number to count it once
             x += 1
-    return sum
+    return result
 
 
-def part2(input):
-    board = input.split('\n')
-    mask = [[-1 for x in line] for line in board]  # mask allowing mapping y,x to number
+def part2(data_input):
+    board = data_input.split('\n')
+    mask = [[-1 for _ in line] for line in board]  # mask allowing mapping y,x to number
     numbers = []  # list of all available numbers
     for y, line in enumerate(board):
         for group in re.finditer(r'[0-9]+', line):
@@ -83,7 +80,7 @@ def part2(input):
             number_len = number_end - number_start
             mask[y][number_start:number_end] = [len(numbers) for _ in range(number_len)]
             numbers.append(int(group.group()))
-    sum = 0
+    result = 0
     for y, line in enumerate(board):
         for x, c in enumerate(line):
             if c == '*':
@@ -94,8 +91,8 @@ def part2(input):
                         number_indices.add(mask[ny][nx])
                 if len(number_indices) == 2:
                     neighbour_numbers = [numbers[idx] for idx in number_indices]
-                    sum += neighbour_numbers[0] * neighbour_numbers[1]
-    return sum
+                    result += neighbour_numbers[0] * neighbour_numbers[1]
+    return result
 
 
 def main():

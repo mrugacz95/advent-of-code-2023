@@ -1,5 +1,4 @@
 from collections import deque, defaultdict
-from functools import cache
 
 from aocd.models import Puzzle
 
@@ -82,8 +81,6 @@ def print_board(board):
 
 
 def find_longest_path(graph, start_node, exit_node):
-    visited = set()
-
     def dfs(node, dist, visited):
         if node in visited:
             return -float('inf')
@@ -96,7 +93,7 @@ def find_longest_path(graph, start_node, exit_node):
         visited.remove(node)
         return max_dist
 
-    return dfs(start_node, 0, visited)
+    return dfs(start_node, 0, set())
 
 
 def part1(input_data):
